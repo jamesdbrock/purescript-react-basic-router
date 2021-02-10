@@ -3,7 +3,7 @@ module React.Basic.Router.Wrapper where
 import Prelude
 
 import Data.Newtype (unwrap)
-import Data.Nullable (null, toNullable)
+import Data.Nullable (Nullable, toNullable)
 import Effect (Effect)
 import Effect.Uncurried (runEffectFn2)
 import React.Basic (element, JSX)
@@ -34,11 +34,11 @@ link = element Foreign.link
 redirect :: forall state. RedirectProps state -> JSX
 redirect = element Foreign.redirect
 
--- | Call `history.push()` with a `null` state.
---
+-- | Pushes a new entry onto the history stack.
+-- |
 -- | https://reactrouter.com/web/api/history
-push :: forall state. History state -> String -> Effect Unit
-push history path = runEffectFn2 (unwrap history).push path null
+push :: forall state. History state -> String -> Nullable state -> Effect Unit
+push history path state = runEffectFn2 (unwrap history).push path state
 
 -- TODO useHistory
 -- Would require a Hooks dependency?
