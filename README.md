@@ -27,16 +27,16 @@ export interface I_MyProps {
 type Props = I_MyProps & RouteComponentProps<{ param1: number; paramUrl: string }>;
 
 export MyComponent = (props: Props) => {
-    const { param1, paramUrl } = props.match.params;
-    useEffect((param1) => {
-      if (param1 > 0) {
-        props.history.push(paramUrl, null);
-      }
-      else {
-        callback(param1, paramUrl);
-      }
-    });
-
+  const { param1, paramUrl } = props.match.params;
+  useEffect((param1) => {
+    if (param1 > 0) {
+      props.history.push(paramUrl, null);
+    }
+    else {
+      props.callback(param1, paramUrl);
+    }
+  });
+  ...
 ```
 
 Then this PureScript React Basic Hooks `MyComponent` will have an API
@@ -49,7 +49,6 @@ type I_MyProps r =
   , callback :: EffectFn2 Int String Unit
   | r
   )
-
 type Props = Record (I_MyProps (RouteComponentProps ()))
 
 MyComponent :: ReactComponent Props
@@ -60,4 +59,5 @@ MyComponent = unsafePerformEffect $ reactComponent "MyComponent" $ \props -> Rea
     if (param1 > 0)
       then push props.history paramUrl (null :: Nullable Foreign)
       else runEffectFn2 props.callback param1 paramUrl
+  ...
 ```
