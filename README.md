@@ -15,28 +15,38 @@ web application which is routed by
 
 # Usage
 
-Suppose we have a TypeScript React component `MyComponent` which expects the following
-type for `props`:
+Suppose we have this nonsense redirecting TypeScript React component `MyComponent` which
+uses the `history` and `match` fields of
+[`RouteComponentProps`](https://reactrouter.com/web/api/Route/route-props):
 
 ```typescript
 export interface I_MyProps {
   prop1: number;
   callback: (count: number, flag: string) => void;
 }
-type Props = I_MyProps & RouteComponentProps<{ param1: number; param2: string }>;
+type Props = I_MyProps & RouteComponentProps<{ param1: number; paramUrl: string }>;
 
 export MyComponent = (props: Props) => {
-    const { param2 } = match.params;
+    const { param1, paramUrl } = props.match.params;
+    useEffect((param1) => {
+      if (param1 > 0) {
+        props.history.push(paramUrl, null);
+      }
+      else {
+        callback(param1, paramUrl);
+      }
+    });
+
 ```
 
-We want to replace `MyComponent` with a PureScript React Basic component.
-
-The `props` type for our PureScript React Basic component `MyComponent` will be:
+Then this PureScript React Basic Hooks `MyComponent` will have an API
+compatible with TypeScript `MyComponent`, and can be dropped
+into the TypeScript program to replace the TypeScript `MyComponent`:
 
 ```purescript
 type I_MyProps r =
   ( prop1 :: Int
-  , callback: EffectFn2 Int String Unit
+  , callback :: EffectFn2 Int String Unit
   | r
   )
 
@@ -44,5 +54,10 @@ type Props = Record (I_MyProps (RouteComponentProps ()))
 
 MyComponent :: ReactComponent Props
 MyComponent = unsafePerformEffect $ reactComponent "MyComponent" $ \props -> React.do
-  let param2Maybe = hush $ runExcept $ props.match.params # readString <=< readProp "param2"
+  let param1 = fromRight $ runExcept $ props.match.params # readInt <=< readProp "param1"
+  let paramUrl = fromRight $ runExcept $ props.match.params # readString <=< readProp "paramUrl"
+  useEffect param1 $
+    if (param1 > 0)
+      then push props.history paramUrl (null :: Nullable Foreign)
+      else runEffectFn2 props.callback param1 paramUrl
 ```

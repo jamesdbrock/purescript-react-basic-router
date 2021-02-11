@@ -62,6 +62,10 @@ type LinkProps props state = { to :: To state, children :: Array JSX, className 
 -- | Compatible with @types/react-router RouteComponentProps
 -- |
 -- | https://reactrouter.com/web/api/Route/route-props
+-- |
+-- | Extra props passed to a
+-- | [`withRouter`](https://reactrouter.com/web/api/withRouter)
+-- | higher-order component.
 type RouteComponentProps r =
   ( history :: History Foreign -- https://reactrouter.com/web/api/history
   , location :: Location Foreign
@@ -73,8 +77,8 @@ type RouteComponentProps r =
 -- | This is a wrapper type for
 -- | https://reactrouter.com/web/api/history
 -- |
--- | You cannot make a `History`, you can only receive it from a component
--- | called by the `RouteComponentProps` of a component called by `withRouter`.
+-- | You cannot make a `History`, you can only receive it from
+-- | the `RouteComponentProps`.
 newtype History state = History
 -- Should correspond to
 --
